@@ -8,17 +8,17 @@ const authenticate = require('../authenticate');
 
 //organized way to routing
 //now update with mongo method
-campsiteRouter
-  .route("/")
-  .get((req, res, next) => {
+campsiteRouter.route('/')
+.get((req, res, next) => {
     Campsite.find()
-      .then((campsites) => {
+    .populate('comments.author')
+    .then(campsites => {
         res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
+        res.setHeader('Content-Type', 'application/json');
         res.json(campsites);
-      })
-      .catch((err) => next(err));
-  })
+    })
+    .catch(err => next(err));
+})
 
   .post(authenticate.verifyUser, (req, res, next) => {
     Campsite.create(req.body)
@@ -47,17 +47,17 @@ campsiteRouter
   });
 
 //campsiteId
-campsiteRouter
-  .route("/:campsiteId")
-  .get((req, res, next) => {
+campsiteRouter.route('/:campsiteId')
+.get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
-      .then((campsite) => {
+    .populate('comments.author')
+    .then(campsite => {
         res.statusCode = 200;
-        res.setHeader("Content-Type", "application/json");
+        res.setHeader('Content-Type', 'application/json');
         res.json(campsite);
-      })
-      .catch((err) => next(err));
-  })
+    })
+    .catch(err => next(err));
+})
 
   .post(authenticate.verifyUser, (req, res) => {
     res.statusCode = 403;
@@ -93,30 +93,30 @@ campsiteRouter
   });
 
 //comments
-campsiteRouter
-  .route("/:campsiteId/comments")
-  .get((req, res, next) => {
+campsiteRouter.route('/:campsiteId/comments')
+.get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
-      .then((campsite) => {
+    .populate('comments.author')
+    .then(campsite => {
         if (campsite) {
-          res.statusCode = 200;
-          res.setHeader("Content-Type", "application/json");
-          res.json(campsite.comments);
+            res.statusCode = 200;
+            res.setHeader('Content-Type', 'application/json');
+            res.json(campsite.comments);
         } else {
-          err = new Error(`Campsite ${req.params.campsiteId} not found`);
-          err.status = 404;
-          return next(err);
+            err = new Error(`Campsite ${req.params.campsiteId} not found`);
+            err.status = 404;
+            return next(err);
         }
-      })
-      .catch((err) => next(err));
-  })
-  
-  .post(authenticate.verifyUser, (req, res, next) => {
+    })
+    .catch(err => next(err));
+})
+.post(authenticate.verifyUser, (req, res, next) => {
     Campsite.findById(req.params.campsiteId)
-      .then((campsite) => {
+    .then(campsite => {
         if (campsite) {
-          campsite.comments.push(req.body);
-          campsite
+            req.body.author = req.user._id;
+            campsite.comments.push(req.body);
+            campsite
             .save()
             .then((campsite) => {
               res.statusCode = 200;
@@ -169,6 +169,7 @@ campsiteRouter
   .route("/:campsiteId/comments/:commentId")
   .get((req, res, next) => {
     Campsite.findById(req.params.campsiteId)
+    .populate('comments.author')
       .then((campsite) => {
         if (campsite && campsite.comments.id(req.params.commentId)) {
           res.statusCode = 200;
