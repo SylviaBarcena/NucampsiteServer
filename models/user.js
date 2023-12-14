@@ -22,3 +22,7 @@ userSchema.plugin(passportLocalMongoose);
 
 
 module.exports = mongoose.model('User', userSchema);
+//or
+// const User = mongoose.model('User', userSchema);
+// module.exports = User;
+

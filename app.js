@@ -4,8 +4,6 @@ var path = require("path");
 
 var logger = require("morgan");
 
-
-
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
 
@@ -21,7 +19,6 @@ const config = require('./config');
 
 //express app contect to MongoDB server
 const mongoose = require("mongoose");
-
 
 const url = config.mongoUrl;
 const connect = mongoose.connect(url, {
