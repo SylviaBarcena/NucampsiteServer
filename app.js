@@ -11,11 +11,11 @@ var usersRouter = require("./routes/users");
 const campsiteRouter = require("./routes/campsiteRouter");
 const promotionRouter = require("./routes/promotionRouter");
 const partnerRouter = require("./routes/partnerRouter");
+const uploadRouter = require("./routes/uploadRouter");
 
 //passport
 const passport = require('passport');
 const config = require('./config');
-
 
 //express app contect to MongoDB server
 const mongoose = require("mongoose");
@@ -34,6 +34,17 @@ connect.then(
 );
 
 var app = express();
+
+//https secure communication
+// Secure traffic only
+app.all('*', (req, res, next) => {
+  if (req.secure) {
+    return next();
+  } else {
+      console.log(`Redirecting to: https://${req.hostname}:${app.get('secPort')}${req.url}`);
+      res.redirect(301, `https://${req.hostname}:${app.get('secPort')}${req.url}`);
+  }
+});
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -55,10 +66,11 @@ app.use("/users", usersRouter);
 app.use(express.static(path.join(__dirname, "public")));
 
 
-//PATH app.use campsite, promotions, partner
+//PATH app.use campsite, promotions, partner and upload routers
 app.use("/campsites", campsiteRouter);
 app.use("/promotions", promotionRouter);
 app.use("/partners", partnerRouter);
+app.use("/imageUpload", uploadRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
