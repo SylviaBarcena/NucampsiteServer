@@ -14,8 +14,8 @@ const partnerRouter = require("./routes/partnerRouter");
 const uploadRouter = require("./routes/uploadRouter");
 
 //passport
-const passport = require('passport');
-const config = require('./config');
+const passport = require("passport");
+const config = require("./config");
 
 //express app contect to MongoDB server
 const mongoose = require("mongoose");
@@ -37,12 +37,17 @@ var app = express();
 
 //https secure communication
 // Secure traffic only
-app.all('*', (req, res, next) => {
+app.all("*", (req, res, next) => {
   if (req.secure) {
     return next();
   } else {
-      console.log(`Redirecting to: https://${req.hostname}:${app.get('secPort')}${req.url}`);
-      res.redirect(301, `https://${req.hostname}:${app.get('secPort')}${req.url}`);
+    console.log(
+      `Redirecting to: https://${req.hostname}:${app.get("secPort")}${req.url}`
+    );
+    res.redirect(
+      301,
+      `https://${req.hostname}:${app.get("secPort")}${req.url}`
+    );
   }
 });
 
@@ -57,14 +62,11 @@ app.use(express.urlencoded({ extended: false }));
 //passport
 app.use(passport.initialize());
 
-
 //user authentication support
 app.use("/", indexRouter);
 app.use("/users", usersRouter);
 
-
 app.use(express.static(path.join(__dirname, "public")));
-
 
 //PATH app.use campsite, promotions, partner and upload routers
 app.use("/campsites", campsiteRouter);
